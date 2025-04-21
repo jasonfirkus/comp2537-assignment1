@@ -51,7 +51,7 @@ app.post("/signup", (req, res) => {
 });
 
 app.use((req, res, next) => {
-  res.status(404).send(readFileSync("./public/html/404.html", "utf8"));
+  res.status(404).send(readFileSync("./public/html/doesnotexist.html", "utf8"));
 });
 
 app.listen(PORT, () => {
