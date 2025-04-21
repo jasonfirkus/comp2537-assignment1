@@ -2,6 +2,7 @@ import express from "express";
 import { readFileSync } from "fs";
 import { createServer } from "livereload";
 import connectLiveReload from "connect-livereload";
+import Joi from "joi";
 
 const app = express();
 const PORT = 3000;
@@ -13,6 +14,12 @@ app.use("/styles", express.static("./public/styles"));
 const liveReloadServer = createServer();
 liveReloadServer.watch("./public/");
 app.use(connectLiveReload());
+
+const signupSchema = Joi.object({
+  name: Joi.string().alphanum().max(20).required(),
+  email: Joi.string().email().max(30).required(),
+  password: Joi.string().max(20).required(),
+});
 
 app.get("/", (req, res) => {
   res.send(readFileSync("./public/html/home.html", "utf8"));
@@ -27,14 +34,19 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/signup", (req, res) => {
-  for (const field in req.body) {
-    if (!req.body[field]) {
-      return res
-        .status(400)
-        .send(
-          readFileSync("./public/html/signup-error.html", "utf8").replace("<!-- FIELD -->", field)
-        );
-    }
+  const { error: validationError, value: validatedBody } = signupSchema.validate(req.body, {
+    stripUnknown: true,
+  });
+
+  if (validationError) {
+    return res
+      .status(400)
+      .send(
+        readFileSync("./public/html/signup-error.html", "utf8").replace(
+          "<!-- FIELD -->",
+          validationError.details[0].context.key
+        )
+      );
   }
 });
 
