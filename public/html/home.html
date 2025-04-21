@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+
+    <link rel="stylesheet" href="/styles/theme.css" />
+
+    <style>
+      #container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100dvh;
+
+        h1 {
+          font-size: clamp(3.5rem, 5vw, 5rem);
+          margin: 50px;
+        }
+        #links-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+          padding: 15px;
+          border-radius: 50px;
+          background-color: rgb(8, 8, 8);
+          width: clamp(450px, 30%, 600px);
+        }
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1>Hello, <span id="name"></span></h1>
+      <div id="links-container">
+        <a href="/signup">Sign up</a>
+        <a href="/login">Login</a>
+        <a href="/members">Members</a>
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+  </body>
+</html>
