@@ -6,7 +6,7 @@ import Joi from "joi";
 import bcrypt from "bcrypt";
 import "dotenv/config";
 import MongoStore from "connect-mongo";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import session from "express-session";
 
 const app = express();
@@ -33,6 +33,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/styles", express.static("./public/styles"));
+app.use("/scripts", express.static("./public/scripts"));
 
 const liveReloadServer = createServer();
 liveReloadServer.watch("./public/");
@@ -42,6 +43,19 @@ const signupSchema = Joi.object({
   name: Joi.string().alphanum().max(20).required(),
   email: Joi.string().email().max(30).required(),
   password: Joi.string().max(20).required(),
+});
+
+app.get("/authenticated", async (req, res) => {
+  console.log("id", req.session.userId);
+
+  if (req.session.userId) {
+    return res.status(200).json({
+      authenticated: true,
+      userId: req.session.userId,
+      userInfo: await db.collection("users").findOne({ _id: new ObjectId(req.session.userId) }),
+    });
+  }
+  res.status(401).json({ authenticated: false });
 });
 
 app.get("/", (req, res) => {
