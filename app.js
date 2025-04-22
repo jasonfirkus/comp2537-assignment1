@@ -126,38 +126,43 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const {
-    error: validationError,
-    value: { email, password },
-  } = loginSchema.validate(req.body, {
-    stripUnknown: true,
-  });
+  try {
+    const {
+      error: validationError,
+      value: { email, password },
+    } = loginSchema.validate(req.body, {
+      stripUnknown: true,
+    });
 
-  if (validationError) {
-    return res
-      .status(400)
-      .send(
-        loginErrorFile.replace(
-          "<!-- MESSAGE -->",
-          `${validationError.details[0].context.key} is required`
-        )
-      );
-  }
+    if (validationError) {
+      return res
+        .status(400)
+        .send(
+          loginErrorFile.replace(
+            "<!-- MESSAGE -->",
+            `${validationError.details[0].context.key} is required`
+          )
+        );
+    }
 
-  const user = await db.collection("users").findOne({ email });
-  if (!user) {
-    return res.status(401).send(loginErrorFile.replace("<!-- MESSAGE -->", "Invalid email"));
-  }
+    const user = await db.collection("users").findOne({ email });
+    if (!user) {
+      return res.status(401).send(loginErrorFile.replace("<!-- MESSAGE -->", "Invalid email"));
+    }
 
-  if (await bcrypt.compare(password, user.password)) {
-    req.session.userId = user._id; //start session
-    req.session.name = user.name;
-    req.session.save();
-    return res.redirect("/members");
-  } else {
-    return res
-      .status(401)
-      .send(loginErrorFile.replace("<!-- MESSAGE -->", "Invalid email/password combination"));
+    if (await bcrypt.compare(password, user.password)) {
+      req.session.userId = user._id; //start session
+      req.session.name = user.name;
+      req.session.save();
+      return res.redirect("/members");
+    } else {
+      return res
+        .status(401)
+        .send(loginErrorFile.replace("<!-- MESSAGE -->", "Invalid email/password combination"));
+    }
+  } catch (error) {
+    console.log("Error logging in user", error);
+    res.status(500).json({ message: "Error logging in user", error });
   }
 });
 
