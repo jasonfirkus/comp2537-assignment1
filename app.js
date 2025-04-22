@@ -18,7 +18,7 @@ const client = new MongoClient(process.env.MONGODB_URI);
 const db = (await client.connect()).db("users");
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.EXPRESS_SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -26,6 +26,9 @@ app.use(
       dbName: "users",
       collectionName: "users",
       ttl: HOUR_IN_SECONDS,
+      crypto: {
+        secret: process.env.MONGODB_SESSION_SECRET,
+      },
     }),
     cookie: { maxAge: 1000 * HOUR_IN_SECONDS },
   })
