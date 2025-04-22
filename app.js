@@ -8,7 +8,6 @@ import "dotenv/config";
 import MongoStore from "connect-mongo";
 import { MongoClient, ObjectId } from "mongodb";
 import session from "express-session";
-import { log } from "console";
 
 const app = express();
 const PORT = 3000;
@@ -26,9 +25,7 @@ app.use(
       dbName: "users",
       collectionName: "users",
       ttl: HOUR_IN_SECONDS,
-      crypto: {
-        secret: process.env.MONGODB_SESSION_SECRET,
-      },
+      crypto: { secret: process.env.MONGODB_SESSION_SECRET },
     }),
     cookie: { maxAge: 1000 * HOUR_IN_SECONDS },
   })
@@ -103,12 +100,7 @@ app.post("/signup", async (req, res) => {
     if (validationError) {
       return res
         .status(400)
-        .send(
-          readFileSync("./public/html/signup-error.html", "utf8").replace(
-            "<!-- FIELD -->",
-            validationError.details[0].context.key
-          )
-        );
+        .send(signupErrorFile.replace("<!-- FIELD -->", validationError.details[0].context.key));
     }
 
     const { insertedId } = await db.collection("users").insertOne({
