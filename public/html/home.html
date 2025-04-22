@@ -5,30 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
 
+    <link rel="icon" href="/assets/leuxs-logo.png" />
     <link rel="stylesheet" href="/styles/theme.css" />
 
     <style>
       #container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 100dvh;
-
         h1 {
-          font-size: clamp(3.5rem, 5vw, 5rem);
-          margin: 50px;
-        }
-        #links-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          gap: 10px;
-          padding: 15px;
-          border-radius: 50px;
-          background-color: rgb(8, 8, 8);
-          width: clamp(450px, 30%, 600px);
+          font-size: var(--h1-font-size-primary);
+          margin: 20px;
         }
       }
 
@@ -48,6 +32,7 @@
       </div>
     </div>
 
+    <script type="module" src="/scripts/isauth.js"></script>
     <script type="module" src="/scripts/home.js"></script>
   </body>
 </html>

@@ -1,15 +1,7 @@
-async function isAuthenticated() {
-  const response = await fetch("/authenticated");
-
-  if (response.ok) {
-    return (await response.json()).userInfo;
-  } else {
-    return false;
-  }
-}
+import isAuthenticated from "/scripts/isauth.js";
 
 function convertToAnon() {
-  document.querySelector("#container h1").innerHTML = "Please sign up or log in";
+  document.querySelector("#container h1").innerHTML = "Please sign up or login";
   document.querySelectorAll(".member").forEach((link) => {
     link.classList.toggle("hidden");
   });

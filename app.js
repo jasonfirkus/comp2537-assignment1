@@ -8,6 +8,7 @@ import "dotenv/config";
 import MongoStore from "connect-mongo";
 import { MongoClient, ObjectId } from "mongodb";
 import session from "express-session";
+import { log } from "console";
 
 const app = express();
 const PORT = 3000;
@@ -34,6 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/styles", express.static("./public/styles"));
 app.use("/scripts", express.static("./public/scripts"));
+app.use("/assets", express.static("./public/assets"));
 
 const liveReloadServer = createServer();
 liveReloadServer.watch("./public/");
@@ -44,6 +46,12 @@ const signupSchema = Joi.object({
   email: Joi.string().email().max(30).required(),
   password: Joi.string().max(20).required(),
 });
+const loginSchema = Joi.object({
+  email: Joi.string().email().max(30).required(),
+  password: Joi.string().max(20).required(),
+});
+const signupErrorFile = readFileSync("./public/html/signup-error.html", "utf8");
+const loginErrorFile = readFileSync("./public/html/login-error.html", "utf8");
 
 app.get("/authenticated", async (req, res) => {
   console.log("id", req.session.userId);
@@ -52,9 +60,10 @@ app.get("/authenticated", async (req, res) => {
     return res.status(200).json({
       authenticated: true,
       userId: req.session.userId,
-      userInfo: await db.collection("users").findOne({ _id: new ObjectId(req.session.userId) }),
+      name: req.session.name,
     });
   }
+
   res.status(401).json({ authenticated: false });
 });
 
@@ -68,6 +77,15 @@ app.get("/signup", (req, res) => {
 
 app.get("/login", (req, res) => {
   res.send(readFileSync("./public/html/login.html", "utf8"));
+});
+
+app.get("/members", (req, res) => {
+  res.send(readFileSync("./public/html/members.html", "utf8"));
+});
+
+app.get("/logout", (req, res) => {
+  req.session.destroy();
+  return res.redirect("/");
 });
 
 app.post("/signup", async (req, res) => {
@@ -97,12 +115,49 @@ app.post("/signup", async (req, res) => {
     });
 
     req.session.userId = insertedId; //start session
+    req.session.name = name;
     req.session.save();
     console.log("Inserted user with id: ", insertedId);
     res.redirect("/members");
   } catch (error) {
     console.log("Error inserting user", error);
     res.status(500).json({ message: "Error inserting user", error });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const {
+    error: validationError,
+    value: { email, password },
+  } = loginSchema.validate(req.body, {
+    stripUnknown: true,
+  });
+
+  if (validationError) {
+    return res
+      .status(400)
+      .send(
+        loginErrorFile.replace(
+          "<!-- MESSAGE -->",
+          `${validationError.details[0].context.key} is required`
+        )
+      );
+  }
+
+  const user = await db.collection("users").findOne({ email });
+  if (!user) {
+    return res.status(401).send(loginErrorFile.replace("<!-- MESSAGE -->", "Invalid email"));
+  }
+
+  if (await bcrypt.compare(password, user.password)) {
+    req.session.userId = user._id; //start session
+    req.session.name = user.name;
+    req.session.save();
+    return res.redirect("/members");
+  } else {
+    return res
+      .status(401)
+      .send(loginErrorFile.replace("<!-- MESSAGE -->", "Invalid email/password combination"));
   }
 });
 
