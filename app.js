@@ -22,8 +22,8 @@ app.use(
     saveUninitialized: false,
     store: MongoStore.create({
       client,
-      dbName: "users",
-      collectionName: "users",
+      dbName: "sessions",
+      collectionName: "sessions",
       ttl: HOUR_IN_SECONDS,
       crypto: { secret: process.env.MONGODB_SESSION_SECRET },
     }),
