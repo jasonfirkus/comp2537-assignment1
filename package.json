@@ -1,15 +1,12 @@
 {
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "connect-livereload": "^0.6.1",
     "connect-mongo": "^5.1.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "joi": "^17.13.3",
-    "livereload": "^0.9.3",
-    "mongodb": "^6.16.0",
-    "nodemon": "^3.1.9"
+    "mongodb": "^6.16.0"
   },
   "name": "comp2537-assignment1",
   "version": "1.0.0",

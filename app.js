@@ -1,9 +1,6 @@
 import express from "express";
 import { readFileSync } from "fs";
 
-import { createServer } from "livereload";
-import connectLiveReload from "connect-livereload";
-
 import Joi from "joi";
 import bcrypt from "bcrypt";
 import "dotenv/config";
@@ -39,10 +36,6 @@ app.use(express.json());
 app.use("/styles", express.static("./public/styles"));
 app.use("/scripts", express.static("./public/scripts"));
 app.use("/assets", express.static("./public/assets"));
-
-const liveReloadServer = createServer();
-liveReloadServer.watch("./public/");
-app.use(connectLiveReload());
 
 const signupSchema = Joi.object({
   name: Joi.string().alphanum().max(20).required(),
